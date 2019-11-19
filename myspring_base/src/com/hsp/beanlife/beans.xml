@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+ 
+ <bean id="personService"  init-method="init" class="com.hsp.beanlife.PersonService">
+ <!-- 这里注入属性的前提是有setName()才能注入成功 destroy-method定制销毁方法 -->
+ 	<property name="name" value="hhw"></property>
+ </bean>
+ 
+<bean id="personService2" scope="prototype"  class="com.hsp.beanlife.PersonService"> 
+ <!-- 这里注入属性的前提是有setName()才能注入成功 -->
+ 	<property name="name" value="xiaohong"></property>
+ </bean> 
+  
+ <!-- 配置自己的后置处理器（有点类似filter过滤器） -->
+  <bean id="myBeanPostProcessor" class="com.hsp.beanlife.MyBeanPostProcessor"></bean>
+</beans>

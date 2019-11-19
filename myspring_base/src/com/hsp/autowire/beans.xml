@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+ 
+ <!-- 启动注解  annotation 再配合类中的注解可以免写下面的bean-->
+ <context:annotation-config/>
+ 
+ <!-- 配置一个master对象 -->
+<bean id="master" class="com.hsp.autowire.Master" autowire="constructor" >
+	<property name="name" value="hhw"/>
+	<!-- 传统set 
+	<property name="dog" ref="dog"></property> 
+	-->
+	
+</bean>
+<!-- 配置一个dog对象 -->
+<bean id="dog12" class="com.hsp.autowire.Dog">
+	<property name="name" value="小白"/>
+	<property name="age" value="3"/>
+</bean>
+</beans>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd  
+        http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+    
+ <!-- 配置被代理的对象 -->
+ <bean id="test1Service" class="com.hsp.aop.Test1Service">
+ 	<property name="name" value="hhw"/>
+ </bean>     
+         
+ <!-- 配置前置通知 (相当于在执行sayhello方法之前，哪些代码要被执行)-->
+ <bean id="myMethodBeforeAdvice" class="com.hsp.aop.MyMethodBeforeAdvice"/>
+ <!-- 配置后置通知 -->
+ <bean id="myAfterReturningAdvice" class="com.hsp.aop.MyAfterReturningAdvice"/>
+ <!-- 配置环绕通知 -->
+ <bean id="myMethodInterceptor" class="com.hsp.aop.MyMethodInterceptor"/>
+ <!-- 配置异常通知 -->
+ <bean id="myThrowsAdvice" class="com.hsp.aop.MyThrowsAdvice"/>
+ <!-- 定义切入点 略-->
+
+ <!-- 配置代理对象 Spring提供-->
+ <bean id="proxyFactoryBean" class="org.springframework.aop.framework.ProxyFactoryBean">
+ 	<!-- 配置代理接口集 （哪些接口需要被代理）-->
+ 	<property name="proxyInterfaces">
+ 		<list>
+ 			<value>com.hsp.aop.TestServiceInter</value>
+ 			<value>com.hsp.aop.TestServiceInter2</value>
+ 		</list>
+ 	</property>
+ 	<!-- 把通知（上面配的前置/后置通知）置入到代理对象 -->
+ 	<property name="interceptorNames">
+ 		<list>
+ 			<!-- 相当于把 myMethodBeforeAdvice前置通知和代理对象关联，可以把通知
+ 			理解为拦截器-->
+ 			<value>myMethodBeforeAdvice</value>
+ 			<!-- 置入后置通知 -->
+ 			<value>myAfterReturningAdvice</value>
+ 			<!-- 置入环绕通知  -->
+ 			<value>myMethodInterceptor</value>
+ 			<!-- 置入异常通知  -->
+ 			<value>myThrowsAdvice</value>
+ 		</list>
+ 	</property>
+ 	<!-- 配置被代理对象 可以指定-->
+ 	<property name="target" ref="test1Service"/>
+ </bean>
+        
+</beans>

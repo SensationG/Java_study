@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+        
+<!-- 在容器文件中配置bean(service/dao/domain/action/数据源 -->
+<!-- bean 元素作用是，当spring框架加载时，spring自动创建一个bean对象，并放入内存
+	以下相当于 UserService userService=new UserService(); 
+	userService.setName("Sensation");
+	name为UserService中的一个属性-->
+<bean id="userService" class="com.service.UserService">
+	<!-- 体现注入的概念 -->
+	<property name="name">
+		<value>Sensation</value>
+	</property>
+	<!-- 在userSerice中引用bybService bean 
+	下面name表示userService中的一个属性，ref表示引用该xml中的一个bean的id（维护bean与bean之间的关系-->
+	<property name="bybService" ref="bybService"/>
+</bean>
+
+<bean id="bybService" class="com.service.BybService">
+	<property name="name" value="Sensation"/>
+</bean>	
+
+</beans>

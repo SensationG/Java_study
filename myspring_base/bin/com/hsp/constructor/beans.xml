@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+        
+<!-- 配置一个雇员对象 -->
+<bean id="employee" class="com.hsp.constructor.Employee">
+<!-- 通过构造函数注入值 -->
+<!-- bean中已经注明了有2个属性 所以默认调有两个属性的构造函数 若为一个属性则调一个属性的 -->
+<!-- index从0开始计数相当于统计共有几个属性 -->
+	<constructor-arg  index="0" type="java.lang.String" value="hhw"/>
+	<constructor-arg  index="1" type="int" value="2222"/>
+</bean>
+
+</beans>

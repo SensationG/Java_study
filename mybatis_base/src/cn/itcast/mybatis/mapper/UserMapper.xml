@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<!--注意：未来使用mapper代理方法开发时，namespace有特殊的重要作用 namespace等于map接口地址-->
+<mapper	namespace="cn.itcast.mybatis.mapper.UserMapper">
+	<!-- 在映射文件中配置很多sql语句 -->
+	<!-- 通过select进行数据库查寻 -->
+	<!-- id:statement的id（用于表示映射文件中的sql) parameterType:指定输入参数类型-->
+	<!-- #{}表示占位符  
+		 #{id}: id表示接收输入的参数，参数名就是id,如果输入的参数是简单类型，#{}中的参数名可以任意
+		 resultType:指定sql输出结果所映射的java对象的类型，select指定resultType表示将单条记录映射成的java对象-->
+		 
+	<!-- 定义resultMap 
+		当sql列需要给列定义别名的时候，就必须使用resultMap 否则结果为null-->
+	<resultMap type="cn.itcast.mybatis.po.User" id="userResultMap">
+		<!-- id：查询列的唯一标识
+		column:查询出来的列名
+		property：type指定的pojo类型中的属性名
+		最终resultMao对column和property作一个映射关系（对应关系）-->
+		<id column="id_" property="id"/>
+		<id column="username_" property="username"/>
+	</resultMap>
+	
+	<!-- 定义sql片段 -->
+	<!-- 这样其他的statement中就可以引用该片段 
+		经验：是基于单表来定义sql片段，这样的话这个sql片段的可重用性才高
+		在sql片段中不用包括where 不然不方便多片段拼接
+	-->
+	<sql id="query_user_where">
+		<if test="userCustomer!=null">
+			<if test="userCustomer.sex!=null and userCustomer.sex!=''">
+				AND user.sex = #{userCustomer.sex}
+			</if>
+			<if test="userCustomer.username!=null and userCustomer.username!=''">
+			 	AND user.username like '%${userCustomer.username}%'
+			</if>
+		</if>
+		<if test="ids!=null">
+			<!-- 使用foreach遍历传入ids
+				collection：指定输入对象中的集合属性
+				item：每个遍历生成的对象
+				open：开始遍历时拼接的串
+				close：结束遍历时拼接的串
+				separator：遍历的两个对象中需要拼接的串
+			 -->
+			 <foreach collection="ids" item="user_id" open="AND(" close=")" separator="or">
+			 		<!-- 每个遍历需要拼接的串 -->
+			 		id=#{user_id}
+			 </foreach>
+		</if>
+	</sql>
+	
+		 
+	<!-- 根据用户名id查询用户信息  只返回一条--> 
+	<select id="findUserById" parameterType="int" resultType="cn.itcast.mybatis.po.User">
+		SELECT * FROM USER WHERE id=#{id}
+	</select>
+	
+	<!-- 使用resultMap来进行输出的映射 
+	resultMap:指定定义的resultMap的id 见上面，如果这个resultMap在其他的mapper文件中，前边需要加namespace-->
+	<select id="findUserByResultMap" parameterType="int" resultMap="userResultMap">
+		SELECT id id_,username username_ From user where id = #{value}
+	</select>
+	
+	<!-- 根据用户名称模糊查询用户信息  可能返回多条  resultType指定单条记录所映射的java类型-->
+	<!-- ${}表示拼接sql串，将收到的参数的内容不加任何修饰拼接在sql中 例如和%拼接  %${value}%
+		 ${value}:接收输入参数的内容，如果传入的是简单类型，则里面只能写value 和 #{}有不同之处
+		  但会引起sql注入 安全漏洞 -->
+	<select id="findUserByName" parameterType="java.lang.String" resultType="cn.itcast.mybatis.po.User" >
+		SELECT * FROM USER WHERE username LIKE '%${value}%'
+	</select>
+	
+	<!-- 添加用户 
+		 parameterType：指定输入参数类型是pojo（包括用户信息）
+		 #{}中指定pojo的属性名，接收到pojo对象的属性值，mybatis通过OGNL获取对象的属性值
+		   没有返回值
+		   keyProperty：将查询到主键值设置到parameterType对象的哪个属性 主键为id 即选中id为查询对象（对于该表）
+		   order：执行顺序，相对于INSERT INTO USER VALUES来说 SELECT LAST_INSERT_ID()的执行顺序 有after和before
+	 -->
+	<insert id="insertUser" parameterType="cn.itcast.mybatis.po.User">
+		<selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer"> <!-- 需要返回 故要定义返回类型 -->
+			SELECT LAST_INSERT_ID()      <!-- 查询刚刚insert进去的主键值（只适用于自增主键） -->
+		</selectKey>
+		<!-- <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String"> 
+			SELECT UUID() 非自增主键查询  先得到主键，将主键设置到user对象的id中，其次在执行insert时，从user对象中取出属性值
+		</selectKey> -->
+		INSERT INTO USER VALUES(#{id},#{username},#{birthday},#{sex},#{address})
+	</insert>
+	
+	<!-- 删除用户 (根据id)-->
+	<delete id="deleteUser" parameterType="java.lang.Integer">
+		DELETE from user WHERE id = #{id}
+	</delete>
+	
+	<!-- 更新用户 （根据主键id)
+		传入用户的更新信息
+		parameterType指定user对象，包括id和更新信息，注意：id必须存在 -->
+	<update id="updateUser" parameterType="cn.itcast.mybatis.po.User">
+		update user set username=#{username},birthday=#{birthday},sex=#{sex} 
+		where id = #{id}
+	</update>
+	
+	<!-- 用户信息综合查询 
+	#{userCustomer.sex}:取出包装对象中性别的值
+	${userCusomer.username}:取出pojo包装对象的name
+	如果是取UserQueryVo类中的定义的变量，则世界写变量名，不用前面的类型 例如：#{sex}
+	因为涉及到子查询 对象类不一定会有输出结果有的类型，所以用usercustomer当作输出类型 其继承user-->
+	
+	<select id="findUserList" parameterType="cn.itcast.mybatis.po.UserQueryVo" 
+			resultType="cn.itcast.mybatis.po.UserCustomer">
+		SELECT * FROM USER 
+		<!-- where 可以自动去掉条件中第一个and 下面使用if的条件前面需要使用and才能和上述sql语句拼接 -->
+		<where>
+			<!-- <if test="userCustomer!=null">
+			<if test="userCustomer.sex!=null and userCustomer.sex!=''">
+				AND user.sex = #{userCustomer.sex}
+			</if>
+			<if test="userCustomer.username!=null and userCustomer.username!=''">
+			 	AND user.username like '%${userCustomer.username}%'
+			</if>
+			</if> 这里使用sql拼接片段 所以注释掉上面的内容-->
+		
+			<!-- 这里引用sql片段的id ，如果refid指定的id不再本mapper文件中，需要前边加namespace -->
+			<include refid="query_user_where"></include>
+			<!-- 在这里还要 引用其他的sql片段 -->
+		</where>
+	</select>
+	
+	<!-- 用户信息的综合查询总数-->
+	<select id="findUserCount" parameterType="cn.itcast.mybatis.po.UserQueryVo" resultType="int">
+		select COUNT(*) FROM USER <!--  from user where user.sex = #{userCustomer.sex} and user.username like '%${userCustomer.username}%'-->
+		<where>
+			<!-- 这里引用sql片段的id ，如果refid指定的id不再本mapper文件中，需要前边加namespace -->
+			<include refid="query_user_where"></include>
+		</where>
+	</select> 
+
+	
+</mapper>

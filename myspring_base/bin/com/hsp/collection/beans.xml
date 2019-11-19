@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<bean id="department" class="com.hsp.collection.Department">
+	<property name="name" value="财务部门"/>
+	<!-- 给数组注值 -->
+	<property name="empName" >
+		<list>
+			<value>小明</value>
+			<value>大明</value>
+			<value>大大名</value>
+		</list>
+	</property>
+	<!-- 给list注入值 -->
+	<property name="empList">
+		<list>
+			<ref bean="emp1"/>
+			<ref bean="emp1"/>
+			<ref bean="emp1"/>
+			<ref bean="emp1"/>
+			<ref bean="emp2"/>
+		</list>
+	</property>
+	<!-- 给set注入值 -->
+	<property name="empsets">
+		<set>
+			<ref bean="emp1"/>
+			<ref bean="emp1"/>
+			<ref bean="emp1"/>
+			<ref bean="emp1"/>
+			<ref bean="emp2"/>
+		</set>
+	</property>
+	<!-- 给map注入值 -->
+	<property name="empMaps">
+		<map>
+			<entry key="1" value-ref="emp1"/>  <!-- key本身是一个值 -->
+			<entry key="2" value-ref="emp2"/>
+		</map>
+	</property>
+	<!-- 给属性集合(property)配置 -->
+	<property name="pp">
+		<props>
+			<prop key="pp1">abcd</prop>
+			<prop key="pp2">hello</prop>
+		</props>
+	</property>
+</bean>
+<!-- 公共数据 -->
+<bean id="emp2" class="com.hsp.collection.Employee">
+	<property name="name" value="天津"/>
+	<property name="id" value="1"/>
+</bean>
+<bean id="emp1" class="com.hsp.collection.Employee">
+	<property name="name" value="北京"/>
+	<property name="id" value="2"/>
+</bean>
+
+
+</beans>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+        
+<!-- 配置学生对象 -->
+<bean id="student" class="com.hsp.inherit.Student">
+	<property name="name" value="hhw"/>
+	<property name="age" value="30"/>
+</bean>
+<!-- bean容器中表述parent继承 表述上面的name和age 是从哪个bean来的-->
+<bean id="graduate" parent="student" class="com.hsp.inherit.Graduate">
+	<!-- 如果自己配置属性name，age（与父对象重复） 则会替换父对象继承的数据 -->
+	<property name="degree" value="学士"/>
+</bean>
+
+</beans>
