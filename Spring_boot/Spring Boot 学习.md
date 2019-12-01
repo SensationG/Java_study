@@ -268,7 +268,38 @@
 
        - 对象（属性和值，键值对）：
 
+         k: v :对象还是使用k: v方式；在下一行来写对象的属性和值的关系，注意缩进；
+
+         ```yaml
+         friends:
+             lastName: zhangsan
+             age: 20
+         ```
+
+         行内写法：
+
+         ```yaml
+         friends: {lastName: zhangsan,age: 20} #注意空格
+         ```
+
        - 数组（List,Set）：
+
+         用 - 值表示数组中的一个元素
+
+         ```yaml
+         pets:
+          - car
+          - dog
+          - pig
+         ```
+
+         行内写法：
+
+         ```yaml
+         pets: [cat,dog,pig]
+         ```
+
+         ​
 
    ​
 

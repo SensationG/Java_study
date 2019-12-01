@@ -35,6 +35,13 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<!-- 导入配置文件处理器，配置文件绑定bean就会有提示，需要导入 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 
 	<build>
