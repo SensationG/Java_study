@@ -299,7 +299,26 @@
          pets: [cat,dog,pig]
          ```
 
-         ​
+   ##### 3. 配置文件的值绑定到bean的属性中
+
+   1. 使用yml文件记录属性的值
+
+      ```yaml
+      person: #对象
+        lastName: zhangsan
+        age: 18
+        boss: false
+        birth: 2019/12/01
+        maps: {k1: v1,k2: 12} #map
+        lists: #list
+          - lisi
+          - zhaoliu
+        dog:  #对象
+          name: xiaogou
+          age: 2
+      ```
+
+      ​
 
    ​
 
