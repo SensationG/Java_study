@@ -12,14 +12,15 @@ public class ValidParentheses20 {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		String sample="(([]){})";//样例"(([]){})"
-		Solution s = new Solution();
+		//Solution s = new Solution();
 		boolean b=false;
-		b=s.isValid(sample);
+	//	b=s.isValid(sample);
 		System.out.println(b);
 	}
 	
 }
 //	检错原则 检测到错的返回false 否则返回true
+/*
 class Solution {
     public boolean isValid(String s) {
     	boolean lr=true;//	双判断
@@ -87,5 +88,5 @@ class Solution {
 		return s;
     }
 }
-
+*/
 
