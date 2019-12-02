@@ -29,169 +29,169 @@
 
    ![TIM截图20191201123316](D:\GitHub\Java_study\Spring_boot\mdPicture\TIM截图20191201123316.png)
 
-   ### 1. HelloWord Spring测试
+### 1. HelloWord Spring测试
 
-   - 功能：浏览器发送Hello请求，服务器接收请求并处理，响应HelloWorld字符串
-   - 项目名称：Springboot001
+- 功能：浏览器发送Hello请求，服务器接收请求并处理，响应HelloWorld字符串
+- 项目名称：Springboot001
 
-   1. 创建一个Maven工程(jar工程) 步骤略
+1. 创建一个Maven工程(jar工程) 步骤略
 
-      记得勾选自动导入包
+   记得勾选自动导入包
 
-      ![TIM截图20191201145046](D:\GitHub\Java_study\Spring_boot\mdPicture\TIM截图20191201145046.png)
+   ![TIM截图20191201145046](D:\GitHub\Java_study\Spring_boot\mdPicture\TIM截图20191201145046.png)
 
-   2. 导入Spring boot相关依赖（从官网获取）
+2. 导入Spring boot相关依赖（从官网获取）
 
-      ```xml
-      <parent>
-              <groupId>org.springframework.boot</groupId>
-              <artifactId>spring-boot-starter-parent</artifactId>
-              <version>1.5.9.RELEASE</version>
-      </parent>
+   ```xml
+   <parent>
+           <groupId>org.springframework.boot</groupId>
+           <artifactId>spring-boot-starter-parent</artifactId>
+           <version>1.5.9.RELEASE</version>
+   </parent>
 
-      <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                </dependency>
-      </dependencies>
-      ```
+   <dependencies>
+             <dependency>
+                 <groupId>org.springframework.boot</groupId>
+                 <artifactId>spring-boot-starter-web</artifactId>
+             </dependency>
+   </dependencies>
+   ```
+
+
+​		在pom.xml中添加上述代码，会**自动导入jar包**
+
+3. 编写一个主程序；启动SpringBoot应用
+
+   ```java
+   /*
+       @SpringBootApplication 来标注一个主程序类，说明这是一个springboot应用
+    */
+   @SpringBootApplication
+   public class HelloWorldMainApplication {
    
+       public static void main(String[] args) {
    
-   ​		在pom.xml中添加上述代码，会**自动导入jar包**
+           //启动spring应用
+           SpringApplication.run(HelloWorldMainApplication.class,args);
+       }
    
-   3. 编写一个主程序；启动SpringBoot应用
+   }
+   ```
 
-      ```java
-      /*
-          @SpringBootApplication 来标注一个主程序类，说明这是一个springboot应用
-       */
-      @SpringBootApplication
-      public class HelloWorldMainApplication {
-      
-          public static void main(String[] args) {
-      
-              //启动spring应用
-              SpringApplication.run(HelloWorldMainApplication.class,args);
-          }
-      
-      }
-      ```
+   在main-java包下的com.athhw包创建一个HelloWorldMainApplication.class作为主程序
 
-      在main-java包下的com.athhw包创建一个HelloWorldMainApplication.class作为主程序
+4. 编写相关Controller
 
-   4. 编写相关Controller
+   ```java
+   @Controller
+   public class HelloController {
+   
+       @ResponseBody//  返回的数据不是html标签的页面，而是其他某种格式的数据时（如json、xml等）使用
+       @RequestMapping("/hello") //处理一个hello请求
+       public String hello(){
+           return "Hello World Spring"; //返回字符串
+       }
+   }
+   ```
 
-      ```java
-      @Controller
-      public class HelloController {
-      
-          @ResponseBody//  返回的数据不是html标签的页面，而是其他某种格式的数据时（如json、xml等）使用
-          @RequestMapping("/hello") //处理一个hello请求
-          public String hello(){
-              return "Hello World Spring"; //返回字符串
-          }
-      }
-      ```
+    在main-java包下的com.athhw-Controller包下创建一个Controller
 
-       在main-java包下的com.athhw-Controller包下创建一个Controller
+5. 测试
 
-   5. 测试
+   在HelloWorldMainApplication.class的main方法左侧控制台点击绿色播放键直接执行，不需要部署Tomcat，测试域名：http://localhost:8080/hello，不需要输入项目名。
 
-      在HelloWorldMainApplication.class的main方法左侧控制台点击绿色播放键直接执行，不需要部署Tomcat，测试域名：http://localhost:8080/hello，不需要输入项目名。
+6. 简化部署
 
-   6. 简化部署
+   在pom.xml中导入插件，就可以直接打包成package，然后使用cmd窗口运行 jar -jar [jar包名]，作为服务器，测试域名同上。所以放入的服务器就无需装Tomcat。
 
-      在pom.xml中导入插件，就可以直接打包成package，然后使用cmd窗口运行 jar -jar [jar包名]，作为服务器，测试域名同上。所以放入的服务器就无需装Tomcat。
+   ```xml
+   <!-- 这个插件，可以将应用打包成一个可执行的jar包；无需在服务器部署Tomcat应用-->
+       <build>
+           <plugins>
+               <plugin>
+                   <groupId>org.springframework.boot</groupId>
+                   <artifactId>spring-boot-maven-plugin</artifactId>
+               </plugin>
+           </plugins>
+       </build>
+   ```
 
-      ```xml
-      <!-- 这个插件，可以将应用打包成一个可执行的jar包；无需在服务器部署Tomcat应用-->
-          <build>
-              <plugins>
-                  <plugin>
-                      <groupId>org.springframework.boot</groupId>
-                      <artifactId>spring-boot-maven-plugin</artifactId>
-                  </plugin>
-              </plugins>
-          </build>
-      ```
+### 2.Hello World探究（各文件作用解析）
 
-   ### 2.Hello World探究（各文件作用解析）
+#####  1.POM文件
 
-   #####  1.POM文件
+1. jar包的版本由谁来同一管理？
 
-   1. jar包的版本由谁来同一管理？
+   ```xml
+   <parent><!-- 父项目 -->
+           <groupId>org.springframework.boot</groupId>
+           <artifactId>spring-boot-starter-parent</artifactId><!-- 父项目路径 -->
+           <version>1.5.9.RELEASE</version>
+   </parent>
 
-      ```xml
-      <parent><!-- 父项目 -->
-              <groupId>org.springframework.boot</groupId>
-              <artifactId>spring-boot-starter-parent</artifactId><!-- 父项目路径 -->
-              <version>1.5.9.RELEASE</version>
-      </parent>
+   父项目的父项目是：
+   由它来真正管理各个版本的依赖。
+   <parent>
+   		<groupId>org.springframework.boot</groupId>
+   		<artifactId>spring-boot-dependencies</artifactId><!-- 父项目路径 -->
+   		<version>1.5.9.RELEASE</version>
+   		<relativePath>../../spring-boot-dependencies</relativePath>
+   </parent>
+   ```
 
-      父项目的父项目是：
-      由它来真正管理各个版本的依赖。
-      <parent>
-      		<groupId>org.springframework.boot</groupId>
-      		<artifactId>spring-boot-dependencies</artifactId><!-- 父项目路径 -->
-      		<version>1.5.9.RELEASE</version>
-      		<relativePath>../../spring-boot-dependencies</relativePath>
-      </parent>
-      ```
+   Spring Boot的版本仲裁管理中心；
 
-      Spring Boot的版本仲裁管理中心；
+   以后我们导入依赖默认是不需要写版本；（没有在dependencies里面管理的依赖自然需要声明版本号
 
-      以后我们导入依赖默认是不需要写版本；（没有在dependencies里面管理的依赖自然需要声明版本号
+2. jar包由谁导进来的？
 
-   2. jar包由谁导进来的？
+   ```xml
+    <dependencies>
+         <dependency>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-starter-web</artifactId><!--web启动器-->
+         </dependency>
+     </dependencies>
+   ```
 
-      ```xml
-       <dependencies>
-            <dependency>
-                  <groupId>org.springframework.boot</groupId>
-                  <artifactId>spring-boot-starter-web</artifactId><!--web启动器-->
-            </dependency>
-        </dependencies>
-      ```
+   spring-boot-starter-web: Springboot场景启动器，帮我们导入了web模块运行所需要的各种组件
 
-      spring-boot-starter-web: Springboot场景启动器，帮我们导入了web模块运行所需要的各种组件
+   根据业务的不同，导入不同的启动器（starter），这里是web模块，所以导入的是web启动器。只需要在项目中引入这些starter，相关的所有依赖包都会自动导入进来，并进行自动版控制。
 
-      根据业务的不同，导入不同的启动器（starter），这里是web模块，所以导入的是web启动器。只需要在项目中引入这些starter，相关的所有依赖包都会自动导入进来，并进行自动版控制。
+   **在使用4.Spring Initializer快速创建Spring Boot项目时，根据提示勾选需要的模块，上面的代码会自动生成。**
 
-      **在使用4.Spring Initializer快速创建Spring Boot项目时，根据提示勾选需要的模块，上面的代码会自动生成。**
+#####  2.主程序
 
-   #####  2.主程序
+1. **@SpringBootApplication**
 
-   1. **@SpringBootApplication**
+   ```java
+   /*
+       @SpringBootApplication 来标注一个主程序类，说明这是一个springboot应用
+    */
+   @SpringBootApplication
+   public class HelloWorldMainApplication {
 
-      ```java
-      /*
-          @SpringBootApplication 来标注一个主程序类，说明这是一个springboot应用
-       */
-      @SpringBootApplication
-      public class HelloWorldMainApplication {
+       public static void main(String[] args) {
 
-          public static void main(String[] args) {
+           //启动spring应用
+           SpringApplication.run(HelloWorldMainApplication.class,args);
+       }
 
-              //启动spring应用
-              SpringApplication.run(HelloWorldMainApplication.class,args);
-          }
+   }
+   ```
 
-      }
-      ```
+   @**SpringBootApplication**:    Spring Boot应用标注在某个类上说明这个类是SpringBoot的主配置类，SpringBoot就应该运行这个类的main方法来启动SpringBoot应用；
 
-      @**SpringBootApplication**:    Spring Boot应用标注在某个类上说明这个类是SpringBoot的主配置类，SpringBoot就应该运行这个类的main方法来启动SpringBoot应用；
+2. SpringBootApplication注解是由多个注解组合而成
 
-   2. SpringBootApplication注解是由多个注解组合而成
+   在SpringBootApplication.class中
 
-      在SpringBootApplication.class中
+   ```java
+   @SpringBootConfiguration //SpringBoot配置类；标注在某个类上，表面这是一个Springboot配置类
+   @EnableAutoConfiguration //开启自动配置功能，以前我们需要配置的东西，SpringBoot帮我们自动配置
+   ```
 
-      ```java
-      @SpringBootConfiguration //SpringBoot配置类；标注在某个类上，表面这是一个Springboot配置类
-      @EnableAutoConfiguration //开启自动配置功能，以前我们需要配置的东西，SpringBoot帮我们自动配置
-      ```
-
-   ### 3.使用Spring Initializer快速创建Spring Boot项目(真正的项目创建从这) 
+### 3.使用Spring Initializer快速创建Spring Boot项目(真正的项目创建从这) 
 
 1. IDE都支持使用Spring的项目创建向导快速创建一个Spring Boot项目；
 2. 选择我们需要的模块；向导会联网创建Spring Boot项目；
@@ -479,22 +479,22 @@
    2. 配置类 **@Configuration** -->注明是spring配置文件
    3. 使用**@Bean** 给容器中添加bean
 
-     ```java
+   ```java
    配置类
    /*
-       @Configuration 指明当前类是一个配置类，就是用来代替之前spring的配置文件
-           在配置文件中使用@Bean的方式来添加组件
+     @Configuration 指明当前类是一个配置类，就是用来代替之前spring的配置文件
+         在配置文件中使用@Bean的方式来添加组件
     */
    @Configuration
    public class MyAppConfig {
    
-       //将方法的返回值添加到容器中，容器中这个bean的id就是方法名
-       @Bean
-       public HelloService helloService(){
-           return new HelloService();
-       }
+     //将方法的返回值添加到容器中，容器中这个bean的id就是方法名
+     @Bean
+     public HelloService helloService(){
+         return new HelloService();
+     }
    }
-     ```
+   ```
 
    ```java
    测试用例 是一个单独的类 IDEA自动生成
@@ -528,7 +528,7 @@
 
 ##### 5.配置文件占位符
 
-	1. 
+ 	1. 
 
 
 
