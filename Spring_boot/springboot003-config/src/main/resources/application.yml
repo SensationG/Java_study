@@ -1,5 +1,18 @@
 server:
   port: 8085
+spring:
+  profiles:
+    active: prod
+---
+server:
+  port: 8084
+spring:
+  profiles: dev
+---
+server:
+  port: 8086
+spring:
+  profiles: prod
 
 #person: #对象
 #  lastName: zhangsan

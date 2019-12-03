@@ -528,7 +528,95 @@
 
 ##### 5.配置文件占位符
 
- 	1. 
+  1. 配置文件中可以使用随机数
+
+     ```properties
+     ${random.value}、${random.int}、${random.long} ${random.int(10)}、${random.int[1024,65536]} 
+     ```
+
+ 	2. 属性值占位符
+
+     ```properties
+     person.last-name=张三${random.uuid}
+     person.age=${random.int}
+     person.birth=2017/12/14
+     person.boss=false
+     person.maps.k1=v1
+     person.maps.k2=v2
+     person.lists=a,b,c
+     person.dog.name=${person.last-name}dog #可以获取上面的值两个拼在一起
+     #person.dog.name=${person.hello:hello}dog 
+     #可以获取上面的值两个拼在一起，如果person.hello没有，那么使用字面，或者使用冒号后指定默认值
+     person.dog.age=15
+     ```
+
+     - **要求属性文件中每个属性的值都必须要有，否则报错**
+     - 可以使用占位符中写入随机数
+     - 可以使用${}获得属性文件中其他的属性值，不分先后
+     - **可以使用${}获取属性文件中不存在的属性，显示的是字面值，也可以使用冒号后指定默认值（见上）**
+
+
+##### 6. Profile 多配置文件下的快速切换/定义
+
+ 1. 多Profile（配置）文件
+
+    Profile是Spring对不同环境提供不同配置功能的支持
+
+    我们在主配置文件编写的时候，文件名可以是 application-{proﬁle}.properties/yml
+    **默认使用application.properties的配置**
+
+    例如：针对不同环境，定义不同的配置文件 profile的内容自定义
+
+    - application-dev.properties
+    - application-prod.properties
+
+ 2. properties激活指定配置文件
+
+    在主配置文件中输入：测试失败）		
+
+    ```properties
+    spring.profiles.active=dev  #激活指定配置文件dev 激活后此配置文件无效
+    ```
+
+	3. yaml激活方式（文档块）无需创建多yml文件 （测试可用）
+
+    - 方式1：文档内激活
+
+      ```yaml
+      server:
+        port: 8085
+      spring:    #指定激活文档块
+        profiles:
+          active: dev
+      ---
+      server:
+        port: 8084
+      spring:    #设定文档块环境名称
+        profiles: dev
+      ---
+      server:
+        port: 8086
+      spring:		 #设定文档块环境名称
+        profiles: prod
+      ```
+
+      ​	使用 --- 区分文档块
+
+    - 方式2: 使用命令行方式激活
+
+      Program arguments(项目设置中)中输入：
+
+      ```xml
+      --spring.profiles.active=dev
+      ```
+
+      
+
+
+
+​			
+
+
 
 
 
