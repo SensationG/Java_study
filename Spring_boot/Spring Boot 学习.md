@@ -578,7 +578,7 @@
     spring.profiles.active=dev  #激活指定配置文件dev 激活后此配置文件无效
     ```
 
-	3. yaml激活方式（文档块）无需创建多yml文件 （测试可用）
+3. yaml激活方式（文档块）无需创建多yml文件 （测试可用）
 
     - 方式1：文档内激活
 
@@ -602,7 +602,7 @@
 
       ​	使用 --- 区分文档块
 
-    - 方式2: 使用命令行方式激活
+    - 方式2: 使用项目设置的方式激活
 
       Program arguments(项目设置中)中输入：
 
@@ -610,11 +610,92 @@
       --spring.profiles.active=dev
       ```
 
-      
+    - 方式3：使用cmd运行jar包的方式**传入参数**激活
+
+      ```xml
+      java -jar springboot003-config-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev
+      ```
+
+    - 方式4：虚拟机参数
+
+      VM option（项目设置中）输入：
+
+      ```xml
+      -Dspring.profiles.active=dev
+      ```
+
+##### 7.配置文件加载位置
+
+ 1. springboot 启动会扫描以下位置的application.properties或者application.yml文件作为Spring boot的默认配置文件，同路径下yml优先于properties
+
+    - ﬁle:./conﬁg/  （项目根目录下/config/）config文件自己创建
+    - ﬁle:./   （项目根目录下）
+    - classpath:/conﬁg/   （项目src-main-resource-config下）
+    - classpath:/  （项目src-main-resource，也是配置文件的默认路径）
+
+    **按上面的顺序优先级由高到底，相同的配置高优先级的配置会覆盖低优先级的配置；所有配置文件都会被加载，若高优先级配置文件中没有配置但低优先级中有配置的内容，也会执行**
+
+	2. **项目打包好以后，我们可以使用命令行参数的形式，启动项目的时候来指定配置文件的新位置；指定配置文件和默认加载的这些配置文件共同起作用形成互补配置；（运维时用）**
+
+    cmd命令：在运行jar包时候补充在后面 指定配置文件的位置G:/application.properties
+
+    java -jar spring-boot-02-conﬁg-02-0.0.1-SNAPSHOT.jar --spring.conﬁg.location=G:/application.properties
+
+#####8.配置文件加载顺序
+
+ 1. SpringBoot也可以从以下位置加载配置文件，优先级从高到底，配置文件会形成互补配置
+
+    1. 命令行参数
+       所有的配置都可以在命令行上进行指定
+       java -jar spring-boot-02-conﬁg-02-0.0.1-SNAPSHOT.jar --server.port=8087 --server.context-path=/abc 多个配置用空格分开；---> **--配置项=值  **
+
+    2. 来自java:comp/env的JNDI属性 
+
+    3. Java系统属性（System.getProperties()）
+
+    4. 操作系统环境变量 
+
+    5. RandomValuePropertySource配置的random.*属性值  
+
+       **由jar包外向jar包内进行寻找； 优先加载带proﬁle:**
+
+    6.  jar包外部的application-{proﬁle}.properties或application.yml(带spring.proﬁle)配置文件
+
+    7. jar包内部的application-{proﬁle}.properties或application.yml(带spring.proﬁle)配置文件 
+
+       **再来加载不带proﬁle :**
+
+    8. jar包外部的application.properties或application.yml(不带spring.proﬁle)配置文件
+
+    9. jar包内部的application.properties或application.yml(不带spring.proﬁle)配置文件
+
+    10. @Conﬁguration注解类上的@PropertySource
+
+    11. 通过SpringApplication.setDefaultProperties指定的默认属性
+        所有支持的配置加载来源；
+
+	 ##### 9. 自动配置原理（精髓 难 暂时略
+
+	- 项目位置：springboot004-autoconfig
+	- 配置文件到底能写什么，怎么写？
+
+1. 自动配置原理
+   1. Springboot启动的时候加载主配置类，开启了自动配置功能@EnableAutoConfiguration
+   2. @EnableAutoConfiguration作用
+2. 精髓：
+   - SpringBoot启动会加载大量的自动配置类
+   - 我们看我们需要的功能有没有SpringBoot默认写好的自动配置类；
+   - 我们再来看这个自动配置类中到底配置了哪些组件；（只要我们要用的组件有，我们就不需要再来配置		了）
+   - 给容器中自动配置类添加组件的时候，会从properties类中获取某些属性。我们就可以在配置文件中指定这些属性的值；
+3. xxxxAutoConﬁgurartion：自动配置类；
+4. 给容器中添加组件
+5. xxxxProperties:封装配置文件中相关属性； 对于这些相关属性就可以在配置文件中指定value
+
+### 三.日志
+
+#####   1. 
 
 
-
-​			
 
 
 

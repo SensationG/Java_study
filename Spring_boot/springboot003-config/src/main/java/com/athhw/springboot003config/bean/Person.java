@@ -25,7 +25,7 @@ import java.util.Map;
  */
 //@PropertySource(value={"classpath:person.properties"})
 @Component
-//@ConfigurationProperties(prefix = "person")
+@ConfigurationProperties(prefix = "person")
 @Validated
 public class Person {
 

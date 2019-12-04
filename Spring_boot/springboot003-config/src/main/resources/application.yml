@@ -3,6 +3,18 @@ server:
 spring:
   profiles:
     active: prod
+person: #对象
+  lastName: zhangsan
+  age: 18
+  boss: false
+  birth: 2019/12/01
+  maps: {k1: v1,k2: 12} #map
+  lists: #list
+    - lisi
+    - zhaoliu
+  dog:  #对象
+    name: xiaogou
+    age: 2
 ---
 server:
   port: 8084
@@ -14,15 +26,3 @@ server:
 spring:
   profiles: prod
 
-#person: #对象
-#  lastName: zhangsan
-#  age: 18
-#  boss: false
-#  birth: 2019/12/01
-#  maps: {k1: v1,k2: 12} #map
-#  lists: #list
-#    - lisi
-#    - zhaoliu
-#  dog:  #对象
-#    name: xiaogou
-#    age: 2
