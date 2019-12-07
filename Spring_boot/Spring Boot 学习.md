@@ -693,7 +693,118 @@
 
 ### 三.日志
 
-#####   1. 
+#####    1. 日志框架
+
+​	 市面上的日志框架：JUL、JCL、Jboss-logging、logback、log4j、log4j2、slf4j....
+
+| 日志门面  （日志的抽象层）                                   | 日志实现                                             |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| ~~JCL（Jakarta  Commons Logging）~~    SLF4j（Simple  Logging Facade for Java）    **~~jboss-logging~~** | Log4j  JUL（java.util.logging）  Log4j2  **Logback** |
+
+左边选一个门面（抽象层）、右边来选一个实现；
+
+日志门面：  SLF4J；
+
+日志实现：Logback；
+
+SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
+
+​	**SpringBoot选用 SLF4j和logback；**
+
+##### 2.SLF4j使用
+
+ 1. 如何在系统中使用SLF4j？
+
+    以后开发的时候，日志记录方法的调用，不应该来直接调用日志的实现类，而是**调用日志的抽象层**。
+
+    **给系统里面导入SLF4j的jar和logback的实现jar**
+
+    ```java
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
+    
+    public class HelloWorld {
+      public static void main(String[] args) {
+        Logger logger = LoggerFactory.getLogger(HelloWorld.class);//LoggerFactory抽象层
+        //getLogger(HelloWorld.class) 里面传入要记录哪个类的信息
+        logger.info("Hello World");//存入信息
+      }
+    }
+    ```
+
+    图示：SLF4j抽象层的各种实现的方法
+
+    <img src="mdPicture/concrete-bindings.png" alt="concrete-bindings" style="zoom:67%;" />
+
+       每一个日志的实现框架都有自己的配置文件。使用slf4j以后，**配置文件还是做成日志实现框架自己本身的	配置文件；**
+
+	2. 遗留问题
+
+    开发系统时可能使用多个框架，spring，mybatis等，他们的默认日志框架都不相同，如何才能统一使用slf4j进行日志记录？
+
+    1. 将系统中其他日志框架先排除出去
+    2. 用中间包（jar包）来替换原有的日志框架（的jar包）
+    3. 我们导入slf4j其他的实现
+
+    <img src="mdpicture/legacy.png"  />
+
+##### 3.Springboot日志关系
+
+ 1. spring-boot-starter的日志底层依赖关系
+
+    ```xml
+    <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+          <version>2.2.2.RELEASE</version>
+          <scope>compile</scope>
+    </dependency>
+    ```
+
+    springboot使用它在做日志功能
+
+    ![](mdpicture/搜狗截图20180131220946.png)
+
+    - springboot底层也是使用slf4j+logback的方式进行日志记录
+    - springboot也把其他的日志包都替换成了slf4j转换包（已经帮我们替换且包名没变动，自动）
+    - <!--如果我们要引入其他框架，一定要把这个框架的默认日志依赖移除(我们需要手动做)-->
+
+##### 4.日志使用
+
+ 1. 默认配置
+
+    springboot已经默认帮我们配好了日志
+
+    ```java
+    @SpringBootTest
+    class Springboot005Slf4jApplicationTests {
+    	//日志记录器 必须是logger4j旗下的 注意选对
+    	Logger logger = LoggerFactory.getLogger(getClass());
+    	@Test
+    	void contextLoads() {
+    		//日志级别
+    		//由低到高 trace<debug.....
+    		//可以调整需要输出的日志级别 这个日志就只会在这个级别以后的高级别生效
+    		logger.trace("这是trace日志 跟踪轨迹");
+    		logger.debug("这是debug日志");
+    		//springboot默认给我们使用得到是info级别的日志 所以默认输出info级别及以后的内容
+    		//在配置文件调整基本
+    		logger.info("这是info日志");
+    		logger.warn("这是warn日志");
+    		logger.error("这是error日志");
+    	}
+    }
+    ```
+
+	2. 通过配置文件更改日志等级
+
+    ```properties
+    #设置这个包下的所有日志级别
+    logging.level.root=trace   #第一种方式
+    logging.level.com.athhw=trace   #第二种方式
+    ```
+
+    官方文档https://www.baeldung.com/spring-boot-logging
 
 
 
@@ -701,4 +812,3 @@
 
 
 
-   ​
