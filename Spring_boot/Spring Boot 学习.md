@@ -674,22 +674,22 @@
     11. 通过SpringApplication.setDefaultProperties指定的默认属性
         所有支持的配置加载来源；
 
-	 ##### 9. 自动配置原理（精髓 难 暂时略
+ ##### 9. 自动配置原理（精髓 难 暂时略
 
-	- 项目位置：springboot004-autoconfig
-	- 配置文件到底能写什么，怎么写？
+- 项目位置：springboot004-autoconfig
+- 配置文件到底能写什么，怎么写？
 
 1. 自动配置原理
    1. Springboot启动的时候加载主配置类，开启了自动配置功能@EnableAutoConfiguration
    2. @EnableAutoConfiguration作用
-2. 精髓：
+ 2. 精髓：
    - SpringBoot启动会加载大量的自动配置类
    - 我们看我们需要的功能有没有SpringBoot默认写好的自动配置类；
    - 我们再来看这个自动配置类中到底配置了哪些组件；（只要我们要用的组件有，我们就不需要再来配置		了）
    - 给容器中自动配置类添加组件的时候，会从properties类中获取某些属性。我们就可以在配置文件中指定这些属性的值；
-3. xxxxAutoConﬁgurartion：自动配置类；
-4. 给容器中添加组件
-5. xxxxProperties:封装配置文件中相关属性； 对于这些相关属性就可以在配置文件中指定value
+ 3. xxxxAutoConﬁgurartion：自动配置类；
+ 4. 给容器中添加组件
+ 5. xxxxProperties:封装配置文件中相关属性； 对于这些相关属性就可以在配置文件中指定value
 
 ### 三.日志
 
@@ -796,19 +796,344 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
     }
     ```
 
-	2. 通过配置文件更改日志等级
+2. 通过配置文件更改日志等级
 
     ```properties
     #设置这个包下的所有日志级别
-    logging.level.root=trace   #第一种方式
-    logging.level.com.athhw=trace   #第二种方式
+    #注释不能写在命令后面否则报错
+    #第一种方式
+    logging.level.root=trace  
     ```
 
-    官方文档https://www.baeldung.com/spring-boot-logging
+​		第二种方式
 
+​		logging.level.com.athhw=trace   
 
+​		官方文档https://www.baeldung.com/spring-boot-logging
 
+ 1. 修改日志默认配置
 
+    ```properties
+    日志输出格式：
+    		%d表示日期时间，
+    		%thread表示线程名，
+    		%-5level：级别从左显示5个字符宽度
+    		%logger{50} 表示logger名字最长50个字符，否则按照句点分割。 
+    		%msg：日志消息，
+    		%n是换行符
+        -->
+        %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n
+    ```
 
+    ```properties
+    #logging.file.name 当前项目下生成日志文件(可选路径 D:/springboot.log）
+    logging.file.name=springboot.log
+    #在项目路径下的盘根目录生成一个 使用spring.log作为默认文件，与logging.file.name属于冲突配置
+    logging.file.path=/spring/log
+    
+    #控制输出格式
+    logging.pattern.console=
+    #指定文件中日志输出的格式
+    logging.pattern.file=
+    ```
 
+ 2. 指定自己的日志配置文件（高级功能暂时略过）
+
+    给类路径（同SpringBoot配置文件路径）下放上每个日志框架自己的配置文件即可；SpringBoot就不使用他默认配置的了，详情可以查看SpringBoot官方文档
+
+    | Logging System          | Customization （自定义配置文件要求的命名）                   |
+    | ----------------------- | ------------------------------------------------------------ |
+    | Logback                 | `logback-spring.xml`, `logback-spring.groovy`, `logback.xml` or `logback.groovy` |
+    | Log4j2                  | `log4j2-spring.xml` or `log4j2.xml`                          |
+    | JDK (Java Util Logging) | `logging.properties`                                         |
+
+    logback.xml：直接就被日志框架识别了；
+
+    **logback-spring.xml**：日志框架就不直接加载日志的配置项，由SpringBoot解析日志配置，可以使用SpringBoot的高级Profile功能
+
+    ```xml
+    <springProfile name="staging">
+        <!-- configuration to be enabled when the "staging" profile is active -->
+      	可以指定某段配置只在某个环境下生效，例如之前的dev等
+    </springProfile>
+    
+    ```
+
+    如：
+
+    ```xml
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+            <!--
+            日志输出格式：
+    			%d表示日期时间，
+    			%thread表示线程名，
+    			%-5level：级别从左显示5个字符宽度
+    			%logger{50} 表示logger名字最长50个字符，否则按照句点分割。 
+    			%msg：日志消息，
+    			%n是换行符
+            -->
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <springProfile name="dev">
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} ----> [%thread] ---> %-5level %logger{50} - %msg%n</pattern>
+                </springProfile>
+                <springProfile name="!dev">
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} ==== [%thread] ==== %-5level %logger{50} - %msg%n</pattern>
+                </springProfile>
+            </layout>
+        </appender>
+    ```
+
+    如果使用logback.xml作为日志配置文件，还要使用profile功能，会有以下错误
+
+     `no applicable action for [springProfile]`
+
+##### 5.切换日志框架 略
+
+### 四. WEB开发
+
+ 1. 使用springboot：
+
+    - **创建springboot应用，选择需要的模块**
+    - **springboot已经默认帮我们配置好了依赖包，只需要在配置文件中指定少量的配置**
+    - **开始编写业务**
+
+2. 自动配置原理？
+
+  1. 这个场景SpringBoot帮我们配置了什么？能不能修改配置，或者扩展？
+
+    xxxxAutoConfiguration ：帮我们给容器中自动配置组件的类，在里面查找能修改的配置属性。
+
+#### 1.SpringBoot对静态资源的映射规则（html css 资源放在哪）
+
+ 1. webjars：静态资源打包成jar包，然后以jar包的方式导入 
+
+    参考网站http://www.webjars.org/
+
+ 2. 静态资源保存路径
+
+    ```
+    "classpath:/META-INF/resources/", 
+    "classpath:/resources/",
+    "classpath:/static/", 
+    "classpath:/public/" 
+    "/"：当前项目的根路径
+    如图 以图为准
+    ```
+
+    ![img](file:///C:\Users\hhw\AppData\Roaming\Tencent\Users\954165983\TIM\WinTemp\RichOle\%_X_$NDA7MU8SZ}~AW84BEW.png)
+
+	3. 在浏览器访问静态资源
+
+    访问当前项目的任何路径，没有处理时，都默认去*静态资源文件夹*（上面三个都是静态资源文件夹）里查找。例如：
+
+    查找static下的asserts->js->某个js文件：（不需要输入外部其余路径）
+
+    ```
+    http://localhost:8080/asserts/js/Chart.min.js
+    ```
+
+	4. 设置欢迎页：静态资源（上面三个都是静态资源文件夹）文件夹下的所有index.html页面；被/**映射；访问路径为：
+
+    ```
+    http://localhost:8080/
+    ```
+
+    默认会找到index.html页面
+
+	5. 设置网页的图标
+
+    所有的**/favicon.ico 都是在静态资源文件夹下找
+
+    把要设置的图标命名为favicon.ico 放在静态资源文件夹下
+
+	6. 上面的路径也可以通过配置文件来更改存放的位置
+
+#### 2.模板引擎
+
+ 1. JSP、Velocity、Freemarker、Thymeleaf
+
+    因为不能直接使用jsp 所以要使用模板引擎作为中间处理
+
+    ![](mdpicture/template-engine.png)
+
+    SpringBoot推荐的Thymeleaf；
+
+    语法更简单，功能更强大；
+
+	2. 引入Thymeleaf
+
+    在pom.xml中引入依赖包：
+
+    ```xml
+    <!--引入thymeleaf-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    ```
+
+    版本自动适配，可手动更改	
+
+    **只要我们把HTML页面放在classpath:/templates/，thymeleaf就能自动渲染；**
+
+	3. 使用Thymeleaf跳转到html网页
+
+    先把success.html放在resources/templates下-->
+
+    在controller下
+
+    ```java
+    //Thymeleaf测试
+    @RequestMapping("/success")
+    public String success(){
+        //找到类路径下的
+        // classpath:/templates/success.html
+        return "success";//网页名
+    ```
+
+	4. **使用Controller通过Thymeleaf向HTML传值**
+
+    ```java
+    //Thymeleaf 传值测试 Controller
+        @RequestMapping("/success1")
+        public String success1(Map<String,Object> map){
+            map.put("hello2","你好");
+            return "success1";//网页名
+        }
+    ```
+
+    ```html
+    <!DOCTYPE html>
+    <!--要用thymeleaf 需要加头文件-->
+    <html lang="en" xmlns:th="http://www.thymeleaf.org"> 
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+    <body>
+        <h1>传值</h1>
+        <!--th:text 将div里面的文本内容设置为 ${hello}是map的key-->
+        <!--div中的文字 打开静态网页时才显示 适合前后端分工合作-->
+        <div th:text="${hello2}">这是显示欢迎信息</div>
+    </body>
+    </html>
+    ```
+
+    html中，需要加入<html lang="en" xmlns:th="http://www.thymeleaf.org"> 头文件
+
+#### 3.Thymeleaf语法
+
+ 1. th:text；改变当前元素里面的文本内容；
+
+    **th：任意html属性；来替换原生属性的值**
+
+    属性一览：
+
+    ![](mdpicture/2018-02-04_123955.png)
+
+	2. 表达式？更多参考PDF开发文档
+
+    ```properties
+    Simple expressions:（表达式语法）
+        Variable Expressions: ${...}：获取变量值；OGNL；
+        		1）、获取对象的属性、调用方法
+        		2）、使用内置的基本对象：例如：${#ctx}
+                #ctx : the context object.
+                #vars: the context variables.
+                #locale : the context locale.
+                #request : (only in Web Contexts) the HttpServletRequest object.
+                #response : (only in Web Contexts) the HttpServletResponse object.
+                #session : (only in Web Contexts) the HttpSession object.
+                #servletContext : (only in Web Contexts) the ServletContext object.
+                   
+                    ${session.foo}
+                3）、内置的一些工具对象：
+    #execInfo : information about the template being processed.
+    #messages : methods for obtaining externalized messages inside variables expressions, in the same way as they would be obtained using #{…} syntax.
+    #uris : methods for escaping parts of URLs/URIs
+    #conversions : methods for executing the configured conversion service (if any).
+    #dates : methods for java.util.Date objects: formatting, component extraction, etc.
+    #calendars : analogous to #dates , but for java.util.Calendar objects.
+    #numbers : methods for formatting numeric objects.
+    #strings : methods for String objects: contains, startsWith, prepending/appending, etc.
+    #objects : methods for objects in general.
+    #bools : methods for boolean evaluation.
+    #arrays : methods for arrays.
+    #lists : methods for lists.
+    #sets : methods for sets.
+    #maps : methods for maps.
+    #aggregates : methods for creating aggregates on arrays or collections.
+    #ids : methods for dealing with id attributes that might be repeated (for example, as a result of an iteration).
+    
+        Selection Variable Expressions: *{...}：选择表达式：和${}在功能上是一样；
+        	补充：配合 th:object="${session.user}：
+       <div th:object="${session.user}">
+        <p>Name: <span th:text="*{firstName}">Sebastian</span>.</p>
+        <p>Surname: <span th:text="*{lastName}">Pepper</span>.</p>
+        <p>Nationality: <span th:text="*{nationality}">Saturn</span>.</p>
+        </div>
+        
+        Message Expressions: #{...}：获取国际化内容
+        Link URL Expressions: @{...}：定义URL；
+        		@{/order/process(execId=${execId},execType='FAST')}
+        Fragment Expressions: ~{...}：片段引用表达式
+        		<div th:insert="~{commons :: main}">...</div>
+        		
+    Literals（字面量）
+          Text literals: 'one text' , 'Another one!' ,…
+          Number literals: 0 , 34 , 3.0 , 12.3 ,…
+          Boolean literals: true , false
+          Null literal: null
+          Literal tokens: one , sometext , main ,…
+    Text operations:（文本操作）
+        String concatenation: +
+        Literal substitutions: |The name is ${name}|
+    Arithmetic operations:（数学运算）
+        Binary operators: + , - , * , / , %
+        Minus sign (unary operator): -
+    Boolean operations:（布尔运算）
+        Binary operators: and , or
+        Boolean negation (unary operator): ! , not
+    Comparisons and equality:（比较运算）
+        Comparators: > , < , >= , <= ( gt , lt , ge , le )
+        Equality operators: == , != ( eq , ne )
+    Conditional operators:条件运算（三元运算符）
+        If-then: (if) ? (then)
+        If-then-else: (if) ? (then) : (else)
+        Default: (value) ?: (defaultvalue)
+    Special tokens:
+        No-Operation: _ 
+    ```
+
+	3. 遍历Map/List
+
+    举例：
+
+    Controller
+
+    ```java
+    //Thymeleaf 传值测试
+        @RequestMapping("/success1")
+        public String success1(Map<String,Object> map){
+            map.put("hello2","你好");
+            map.put("users", Arrays.asList("zhangsan","lisi","wangwu"));
+            return "success1";//网页名
+        }
+    ```
+
+    Html
+
+    ```html
+    <!--输出遍历集合数据-->
+    <!--th:each 每次遍历都会生成这个标签 这里是3个h4-->
+    <h4 th:text="${user}" th:each="user:${users}"></h4>
+    
+    <!--3个span-->
+    <h4>
+        <!--同样是遍历写法-->
+        <span th:each="user:${users}"> [[${user}]]</span>
+    </h4>
+    ```
+
+    
 

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!--要用thymeleaf 需要加头文件-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>传值</h1>
+    <!--th:text 将div里面的文本内容设置为 ${hello}是map的key-->
+    <!--div中的文字 打开静态网页时才显示-->
+    <div th:text="${hello2}">这是显示欢迎信息</div>
+
+    <!--输出遍历集合数据-->
+    <!--th:each 每次遍历都会生成这个标签 这里是3个h4-->
+    <h4 th:text="${user}" th:each="user:${users}"></h4>
+
+    <!--3个span-->
+    <h4>
+        <!--同样是遍历写法-->
+        <span th:each="user:${users}"> [[${user}]]</span>
+    </h4>
+</body>
+</html>

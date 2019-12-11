@@ -1,0 +1,11 @@
+2019-12-09 15:35:35.752  INFO 25308 --- [main] c.a.s.Springboot005Slf4jApplicationTests : Starting Springboot005Slf4jApplicationTests on DESKTOP-RLAFMOV with PID 25308 (started by hhw in D:\GitHub\Java_study\Spring_boot\springboot005-slf4j)
+2019-12-09 15:35:35.753 DEBUG 25308 --- [main] c.a.s.Springboot005Slf4jApplicationTests : Running with Spring Boot v2.2.2.RELEASE, Spring v5.2.2.RELEASE
+2019-12-09 15:35:35.754  INFO 25308 --- [main] c.a.s.Springboot005Slf4jApplicationTests : No active profile set, falling back to default profiles: default
+2019-12-09 15:35:37.014  INFO 25308 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2019-12-09 15:35:37.289  INFO 25308 --- [main] c.a.s.Springboot005Slf4jApplicationTests : Started Springboot005Slf4jApplicationTests in 1.903 seconds (JVM running for 2.913)
+2019-12-09 15:35:37.479 TRACE 25308 --- [main] c.a.s.Springboot005Slf4jApplicationTests : 这是trace日志 跟踪轨迹
+2019-12-09 15:35:37.480 DEBUG 25308 --- [main] c.a.s.Springboot005Slf4jApplicationTests : 这是debug日志
+2019-12-09 15:35:37.480  INFO 25308 --- [main] c.a.s.Springboot005Slf4jApplicationTests : 这是info日志
+2019-12-09 15:35:37.480  WARN 25308 --- [main] c.a.s.Springboot005Slf4jApplicationTests : 这是warn日志
+2019-12-09 15:35:37.480 ERROR 25308 --- [main] c.a.s.Springboot005Slf4jApplicationTests : 这是error日志
+2019-12-09 15:35:37.498  INFO 25308 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
