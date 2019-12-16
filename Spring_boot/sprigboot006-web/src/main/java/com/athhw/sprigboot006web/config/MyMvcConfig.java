@@ -1,5 +1,8 @@
 package com.athhw.sprigboot006web.config;
+import com.athhw.sprigboot006web.clanguage.MylocaleResolver;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -12,5 +15,11 @@ public class MyMvcConfig implements WebMvcConfigurer {
         //将默认主页定向到模板引擎解析的templates下的login.html
         registry.addViewController("/").setViewName("login");
         registry.addViewController("/index.html").setViewName("login");
+    }
+
+    //使用自定义区域解析器
+    @Bean
+    public LocaleResolver localeResolver(){
+        return new MylocaleResolver();
     }
 }

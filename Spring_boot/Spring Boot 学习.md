@@ -1321,5 +1321,49 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
  5. 点击按钮切换国际化
 
+     1. 设置切换区域的href
+
+        ```html
+        <!--thymeleaf 写法-->
+        <a class="btn btn-sm" th:href="@{/index.html(l='zh_CN')}">中文</a>
+        <a class="btn btn-sm" th:href="@{/index.html(l='en_US')}">English</a>
+        ```
+
+     2. 编写区域信息解析器
+
+        ```java
+        //区域信息解析器 接口LocaleResolver 根据url切换地区
+        public class MylocaleResolver implements LocaleResolver {
+        
+        //解析区域信息
+        @Override
+        public Locale resolveLocale(HttpServletRequest httpServletRequest) {
+        String l= httpServletRequest.getParameter("l"); //解析url中的参数带的值
+        Locale locale = Locale.getDefault(); //设定默认值
+        if(!StringUtils.isEmpty(l)){ //检测l是否为空
+            String[] split=l.split("_"); //以下划线切割l
+            locale = new Locale(split[0],split[1]);
+        }
+        return locale;
+            }
+        
+        @Override
+        public void setLocale(HttpServletRequest httpServletRequest, @Nullable HttpServletResponse httpServletResponse, @Nullable Locale locale) {
+            }
+        }
+        ```
+
+     3. 在Config中将手动编写的区域信息解析器注入bean
+
+        ```java
+        //使用自定义区域解析器
+        @Bean
+        public LocaleResolver localeResolver(){
+            return new MylocaleResolver();
+        }
+        ```
+
+        
+
 
 
