@@ -31,6 +31,18 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
+		<!--引入jquery-->
+		<dependency>
+			<groupId>org.webjar</groupId>
+			<artifactId>jquery</artifactId>
+		</dependency>
+
+		<!--引入bootstrap-->
+		<dependency>
+			<groupId>org.webjar</groupId>
+			<artifactId>bootstrap</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

@@ -21,6 +21,7 @@ public class HelloController {
     public String success(){
         //找到类路径下的
         // classpath:/templates/success.html
+        // return会得到模板引擎的解析，访问templates下的html
         return "success";//网页名
     }
 
@@ -31,4 +32,10 @@ public class HelloController {
         map.put("users", Arrays.asList("zhangsan","lisi","wangwu"));
         return "success1";//网页名
     }
+
+//    //定向访问templates下的index 改用mvcconfig添加bean的方式
+//    @RequestMapping({"/","/index"})
+//    public String index(){
+//        return "index";
+//    }
 }

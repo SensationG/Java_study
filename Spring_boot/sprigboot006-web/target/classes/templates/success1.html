@@ -13,7 +13,7 @@
 
     <!--输出遍历集合数据-->
     <!--th:each 每次遍历都会生成这个标签 这里是3个h4-->
-    <h4 th:each="user:${users}">[[${user}]]</h4>
+    <h4 th:text="${user}" th:each="user:${users}"></h4>
 
     <!--3个span-->
     <h4>

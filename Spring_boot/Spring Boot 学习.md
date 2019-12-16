@@ -889,7 +889,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
 ##### 5.切换日志框架 略
 
-### 四. WEB开发
+### 四. WEB开发前期配置
 
  1. 使用springboot：
 
@@ -922,7 +922,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
     ![img](file:///C:\Users\hhw\AppData\Roaming\Tencent\Users\954165983\TIM\WinTemp\RichOle\%_X_$NDA7MU8SZ}~AW84BEW.png)
 
-	3. 在浏览器访问静态资源
+3. 在浏览器访问静态资源
 
     访问当前项目的任何路径，没有处理时，都默认去*静态资源文件夹*（上面三个都是静态资源文件夹）里查找。例如：
 
@@ -932,7 +932,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
     http://localhost:8080/asserts/js/Chart.min.js
     ```
 
-	4. 设置欢迎页：静态资源（上面三个都是静态资源文件夹）文件夹下的所有index.html页面；被/**映射；访问路径为：
+4. 设置欢迎页：静态资源（上面三个都是静态资源文件夹）文件夹下的所有index.html页面；被/**映射；访问路径为：
 
     ```
     http://localhost:8080/
@@ -940,13 +940,13 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
     默认会找到index.html页面
 
-	5. 设置网页的图标
+5. 设置网页的图标
 
     所有的**/favicon.ico 都是在静态资源文件夹下找
 
     把要设置的图标命名为favicon.ico 放在静态资源文件夹下
 
-	6. 上面的路径也可以通过配置文件来更改存放的位置
+6. 上面的路径也可以通过配置文件来更改存放的位置
 
 #### 2.模板引擎
 
@@ -960,7 +960,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
     语法更简单，功能更强大；
 
-	2. 引入Thymeleaf
+2. 引入Thymeleaf
 
     在pom.xml中引入依赖包：
 
@@ -976,7 +976,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
     **只要我们把HTML页面放在classpath:/templates/，thymeleaf就能自动渲染；**
 
-	3. 使用Thymeleaf跳转到html网页
+3. 使用Thymeleaf跳转到html网页
 
     先把success.html放在resources/templates下-->
 
@@ -991,7 +991,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
         return "success";//网页名
     ```
 
-	4. **使用Controller通过Thymeleaf向HTML传值**
+4. **使用Controller通过Thymeleaf向HTML传值**
 
     ```java
     //Thymeleaf 传值测试 Controller
@@ -1031,7 +1031,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
     ![](mdpicture/2018-02-04_123955.png)
 
-	2. 表达式？更多参考PDF开发文档
+2. 表达式？更多参考PDF开发文档
 
     ```properties
     Simple expressions:（表达式语法）
@@ -1105,7 +1105,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
         No-Operation: _ 
     ```
 
-	3. 遍历Map/List
+3. 遍历Map/List
 
     举例：
 
@@ -1135,5 +1135,191 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
     </h4>
     ```
 
+#### 4.SpringMVC自动配置
+
+ 1. Springboot自动配置了SpringMVC
+
+ 2. 以下是SpringBoot对SpringMVC的默认配置:**==（自动配置在WebMvcAutoConfiguration这个类）==**
+
+    - Inclusion of `ContentNegotiatingViewResolver` and `BeanNameViewResolver` beans.
+
+      - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
+      - ContentNegotiatingViewResolver：组合所有的视图解析器的；
+      - ==如何定制：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；==
+
+    - Support for serving static resources, including support for WebJars (see below).静态资源文件夹路径,webjars
+
+    - Static `index.html` support. 静态首页访问
+
+    - Custom `Favicon` support (see below).  favicon.ico
+
+      
+
+    - 自动注册了 of `Converter`, `GenericConverter`, `Formatter` beans.
+
+      - Converter：转换器；  public String hello(User user)：类型转换使用Converter
+      - `Formatter`  格式化器；  2017.12.17===Date；
+
+    ```java
+    		@Bean
+    		@ConditionalOnProperty(prefix = "spring.mvc", name = "date-format")//在文件中配置日期格式化的规则
+    		public Formatter<Date> dateFormatter() {
+    			return new DateFormatter(this.mvcProperties.getDateFormat());//日期格式化组件
+    		}
+    ```
+
+    ​	==自己添加的格式化器转换器，我们只需要放在容器中即可==
+
+    - Support for `HttpMessageConverters` (see below).
+
+      - HttpMessageConverter：SpringMVC用来转换Http请求和响应的；User---Json；
+
+      - `HttpMessageConverters` 是从容器中确定；获取所有的HttpMessageConverter；
+
+        ==自己给容器中添加HttpMessageConverter，只需要将自己的组件注册容器中（@Bean,@Component）==
+
+        
+
+    - Automatic registration of `MessageCodesResolver` (see below).定义错误代码生成规则
+
+    - Automatic use of a `ConfigurableWebBindingInitializer` bean (see below).
+
+      ==我们可以配置一个ConfigurableWebBindingInitializer来替换默认的；（添加到容器）==
+
+      ```
+      初始化WebDataBinder；
+      请求数据=====JavaBean；
+      ```
+
+    **org.springframework.boot.autoconfigure.web：web的所有自动场景；**
+
+    If you want to keep Spring Boot MVC features, and you just want to add additional [MVC configuration](https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/htmlsingle#mvc) (interceptors, formatters, view controllers etc.) you can add your own `@Configuration` class of type `WebMvcConfigurerAdapter`, but **without** `@EnableWebMvc`. If you wish to provide custom instances of `RequestMappingHandlerMapping`, `RequestMappingHandlerAdapter` or `ExceptionHandlerExceptionResolver` you can declare a `WebMvcRegistrationsAdapter` instance providing such components.
+
+    If you want to take complete control of Spring MVC, you can add your own `@Configuration` annotated with `@EnableWebMvc`.
+
+#### 5.SpringMVC扩展
+
+ 1. **编写一个配置类** 使用`@Configuration` 注解，继承`WebMvcConfigurationSupport`不能标注`@EnableWebMvc` #`WebMvcConfigurationSupport`已经淘汰，改用实现WebMvcConfigurer
+
+ 2. 例如扩展URL映射
+
+    在纯SpringMVC中 扩展：
+
+    ```xml
+    <mvc:view-controller path="/atguigu" view-name="success"/>
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/atguigu"/>
+            <bean></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    ```
+
+    在springboot中扩展：
+
+    使用WebMvcConfigurationSupport类来扩展springmvc功能，查看其中的方法由此得出可扩展的功能。**需要什么功能，在配置类中重写该方法即可**
+
+    ```java
+    //使用WebMvcConfigurationSupport来扩展springmvc功能
+    @Configuration //步骤1 使用@Configuration注解 2 继承WebMvcConfigurationSupport
+    public class MyMvcConfig implements WebMvcConfigurer {
+        public void addViewControllers(ViewControllerRegistry registry) {
     
+            //将默认主页定向到模板引擎解析的templates下的login.html
+            registry.addViewController("/").setViewName("success");
+    
+        }
+    }
+    
+    ```
+
+#### 6.取消自动配置
+
+	1. 在我们自己的springMVC配置类中（5中的配置类）添加`@EnableWebMvc`注解即可。此时SpringMVC的所有自动配置都失效了
+
+#### 7.如何修改SpringBoot默认配置
+
+	1. SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来
+ 	2. 在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置
+ 	3. 在SpringBoot中会有很多的xxxCustomizer帮助我们进行定制配置
+
+### 五.WEB开发
+
+	1. 导入开发所需资源包 （dao,实体类导入到工程目录下，html导入到templates下）
+
+#### 1.访问首页index
+
+ 1. 设定输入端口号或者index跳转到模板引擎解析下的templates/login,index
+
+    在config文件下设定
+
+    ```java
+    //使用WebMvcConfigurationSupport来扩展springmvc功能
+    @Configuration //步骤1 使用@Configuration注解 2 继承WebMvcConfigurationSupport
+    public class MyMvcConfig implements WebMvcConfigurer {
+        public void addViewControllers(ViewControllerRegistry registry) {
+    
+            //将默认主页定向到模板引擎解析的templates下的login.html
+            registry.addViewController("/").setViewName("login");
+    
+        }
+    }
+    ```
+
+#### 2.国际化（多语言环境）
+
+ 1. 编写国际化配置文件（根据不同语言显示）
+
+ 2. 使用配置文件：resouces目录下新建一个文件夹，在文件夹下新建配置文件：
+
+    ![](mdpicture/搜狗截图20180211130721.png)
+
+    文件夹命名随意，配置文件命名 一般为页面名_ 规范（语言_国家代码）
+
+3. springboot自动配置好了管理国际化文件的组件
+
+    只需在springboot配置文件中添加自己的国际化文件
+
+    ```properties
+    spring.messages.basename=i18n.login
+    ```
+
+4. 去页面获取国际化的值
+
+    使用thymeleaf的 #{...}获取国际化的值 （查询手册）
+
+    使用th:text重写每个组件的值 例如 th:text="#{login.tip} 直接获取国际化组件的值
+
+    ```html
+    <body class="text-center">
+    		<form class="form-signin" action="dashboard.html">
+    			<img class="mb-4" src="asserts/img/bootstrap-solid.svg" alt="" width="72" height="72">
+    			<h1 class="h3 mb-3 font-weight-normal" th:text="#{login.tip}">Please sign in</h1>
+    			<label class="sr-only">Username</label>
+    			<input type="text" class="form-control" placeholder="Username" th:placeholder="#{login.username}" required="" autofocus="">
+    			<label class="sr-only">Password</label>
+    			<input type="password" class="form-control" placeholder="Password" th:placeholder="#{login.passwd}" required="">
+    			<div class="checkbox mb-3">
+    				<label>
+                <!-- input写法要使用行内写法[[...]] 里面写表达式 -->   
+              <input type="checkbox" value="remember-me" />[[#{login.remember}]]
+            </label>
+    			</div>
+    			<button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.btn}"></button>
+    			<p class="mt-5 mb-3 text-muted">© 2017-2018</p>
+    			<a class="btn btn-sm">中文</a>
+    			<a class="btn btn-sm">English</a>
+    		</form>
+    
+    	</body>
+       
+    ```
+
+    效果:根据浏览器语言可以自动切换国际化值
+
+    PS： 遇到乱码情况，使用default setting设置语言为UTF-8 并重新输入配置文件信息
+
+ 5. 点击按钮切换国际化
+
+
 
