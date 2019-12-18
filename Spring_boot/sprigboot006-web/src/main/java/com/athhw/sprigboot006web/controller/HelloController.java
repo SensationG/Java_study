@@ -10,6 +10,7 @@ import java.util.Map;
 @Controller
 public class HelloController {
 
+
     @ResponseBody
     @RequestMapping("/hello")
     public String hello(){
@@ -33,9 +34,4 @@ public class HelloController {
         return "success1";//网页名
     }
 
-//    //定向访问templates下的index 改用mvcconfig添加bean的方式
-//    @RequestMapping({"/","/index"})
-//    public String index(){
-//        return "index";
-//    }
 }

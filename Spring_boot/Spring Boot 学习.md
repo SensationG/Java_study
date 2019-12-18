@@ -1245,7 +1245,8 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
 ### 五.WEB开发
 
-	1. 导入开发所需资源包 （dao,实体类导入到工程目录下，html导入到templates下）
+1. 导入开发所需资源包 （dao,实体类导入到工程目录下，html导入到templates下）
+2. 项目名称：Springboot006-web
 
 #### 1.访问首页index
 
@@ -1363,7 +1364,288 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
         }
         ```
 
-        
+#### 3.登陆
 
+ 1. 编写Controller （LoginController）
 
+    ```java
+    //处理登陆请求
+    @Controller
+    public class LoginController {
+    
+        @PostMapping(value="/login")//集成post请求
+        //@RequestMapping(value="user/login",method= RequestMethod.POST)
+        //@RequestParam(参数) 指定从请求参数(html传来的)获取，若html没有提交，则会报错
+        public String login(@RequestParam("username")String username,
+                            @RequestParam("password")String passwd){
+            if(!StringUtils.isEmpty(username) && "123456".equals(passwd)){
+                //登陆成功
+                return "dashboard";
+            }else{
+                return "login";
+            }
+        }
+    }
+    ```
+
+    判断登陆条件：用户名不为空，密码=123456
+
+ 2. 编写Html 重新提交表单路径
+
+    ```html
+    <!--th:action="@{/user/login}" 表单提交地址 method="post"-->
+    		<form class="form-signin" action="dashboard.html" th:action="@{/login}" method="post">
+    ```
+
+	3. 开发期间，禁用模板引擎缓存，才能让Html页面修改实时生效
+
+    properties:
+
+    ```properties
+    #禁用模板引擎缓存 html修改后ctrl+F9 否则修改的html页面不会实时生效
+    spring.thymeleaf.cache=false
+    ```
+
+	4. 登陆false后登陆页显示错误消息
+
+    改写Controller：使用map记录错误信息
+
+    ```java
+    //处理登陆请求
+    @Controller
+    public class LoginController {
+    
+        @PostMapping(value="/login")//集成post请求
+        //@RequestMapping(value="user/login",method= RequestMethod.POST)
+        //@RequestParam(参数) 指定从请求参数(html传来的)获取，若html没有提交，则会报错
+        public String login(@RequestParam("username")String username,
+                            @RequestParam("password")String passwd, Map<String,Object> map){
+            if(!StringUtils.isEmpty(username) && "123456".equals(passwd)){
+                //登陆成功
+                return "dashboard";
+            }else{
+                map.put("msg","用户名密码错误"); //使用map或mpdelandview 但这里要求返回String 所以只能用map
+                return "login";
+            }
+        }
+    
+    ```
+
+    在Html写入从Controller获取的信息：使用thymeleaf语句
+
+    ```html
+    <!--登陆错误消息提示 满足th:if条件检查字符串是否为空后才显示该p标签-->
+    <p style="color: red;" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
+    ```
+
+#### 4.使用拦截器进行登陆检查
+
+ 1. 在controller中加入登陆成功后添加session
+
+    ```java
+    @Controller
+    public class LoginController {
+    
+        @PostMapping(value="/login")//集成post请求
+        //@RequestMapping(value="user/login",method= RequestMethod.POST)
+        //@RequestParam(参数) 指定从请求参数(html传来的)获取，若html没有提交，则会报错
+        public String login(@RequestParam("username")String username,
+                            @RequestParam("password")String passwd,
+                            Map<String,Object> map,
+                            HttpSession session
+                            ){
+            if(!StringUtils.isEmpty(username) && "123456".equals(passwd)){
+                //登陆成功
+                session.setAttribute("loginsuccess",username); //添加session
+                return "redirect:/main.html"; //配合拦截器
+            }else{
+                map.put("msg","用户名密码错误"); //使用map或mpdelandview 但这里要求返回String 所以只能用map
+                return "login";
+            }
+        }
+    
+    ```
+
+ 2. 自定义一个拦截器类
+
+    ```java
+    //登陆拦截器 实现HandlerInterceptor接口
+    /*
+        检查登陆状态 利用controller传来的session
+        登陆好的用户放在session中
+     */
+    public class loginInterceptor implements HandlerInterceptor {
+        @Override
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+            Object user = request.getSession().getAttribute("loginsuccess");
+            if (user == null) {
+                //未登录 返回登陆页面并提示信息
+                request.setAttribute("msg","没有权限请登陆");
+                //跳转回登陆页面
+                request.getRequestDispatcher("/index.html").forward(request,response);
+                return false;
+            } else {
+                //已登录 请求放行
+                return true;
+            }
+        }
+    }
+    ```
+
+	3. 在Configuration中添加自定义的拦截器类
+
+    ```java
+    //扩展自定义拦截器
+        public void addInterceptors(InterceptorRegistry registry) {
+            List<String> noturls = new ArrayList<>(); //不拦截的页面和请求
+            noturls.add("/index.html");
+            noturls.add("/");
+            noturls.add("/login");
+            noturls.add("/asserts/**"); //静态资源不能拦截
+            registry.addInterceptor(new loginInterceptor()).addPathPatterns("/**") //-》 /**拦截所有请求
+                        .excludePathPatterns(noturls);
+        }
+    ```
+
+    使用` .excludePathPatterns(noturls);`方法排除掉登陆页面的拦截
+
+	4. 在mian html页面获取session 显示登陆用户的用户名
+
+    使用thymeleaf表达式行内写法获取session中的值
+
+    ```html
+    [[${session.loginsuccess}]]
+    ```
+
+####5.Restful风格简介
+
+ 1. 员工的增删查改使用restful风格进行开发
+
+ 2. 两种风格比较
+
+    crud：增删查改
+
+    |      | 普通CRUD（uri来区分操作） | RestfulCRUD       |
+    | ---- | ------------------------- | ----------------- |
+    | 查询 | getEmp                    | emp---GET         |
+    | 添加 | addEmp?xxx                | emp---POST        |
+    | 修改 | updateEmp?id=xxx&xxx=xx   | emp/{id}---PUT    |
+    | 删除 | deleteEmp?id=1            | emp/{id}---DELETE |
+
+	3. 本web开发的请求样例
+
+    举例：以id=1 的员工为例
+
+    | 实验功能                             | 请求URI | 请求方式 |
+    | ------------------------------------ | ------- | -------- |
+    | 查询所有员工                         | emps    | GET      |
+    | 查询某个员工(来到修改页面)           | emp/1   | GET      |
+    | 来到添加页面                         | emp     | GET      |
+    | 添加员工                             | emp     | POST     |
+    | 来到修改页面（查出员工进行信息回显） | emp/1   | GET      |
+    | 修改员工                             | emp     | PUT      |
+    | 删除员工                             | emp/1   | DELETE   |
+
+#### 6.员工列表
+
+ 1. 编写Controller
+
+    ```java
+    @Controller
+    public class Employee {
+    
+        @Autowired
+        EmployeeDao employeeDao = new EmployeeDao();
+    
+        @GetMapping("/emps")
+        public String emplist(ModelAndView modelAndView){
+    
+            Collection<com.athhw.sprigboot006web.entities.Employee> employee = employeeDao.getAll();
+            modelAndView.addObject("emps",employee);
+            return "emp/list"; //把list放到了templates/emp 文件夹内
+        }
+    }
+    ```
+
+#### 7.使用thymeleaf复用公用div
+
+ 1. ```html
+    1、抽取公共片段
+    <div th:fragment="copy">
+    &copy; 2011 The Good Thymes Virtual Grocery
+    </div>
+    
+    2、引入公共片段
+    <div th:insert="~{footer :: copy}"></div>
+    ~{templatename::selector}：模板名::选择器
+    ~{templatename::fragmentname}:模板名::片段名
+    
+    3、默认效果：
+    insert的公共片段在div标签中
+    如果使用th:insert等属性进行引入，可以不用写~{}：
+    行内写法可以加上：[[~{}]];[(~{})]；
+    ```
+
+ 2. 三种引入公共片段的th属性：
+
+    **th:insert**：将公共片段整个插入到声明引入的元素中
+
+    **th:replace**：将声明引入的元素替换为公共片段
+
+    **th:include**：将被引入的片段的内容包含进这个标签中
+
+    ```html
+    <footer th:fragment="copy">
+    &copy; 2011 The Good Thymes Virtual Grocery
+    </footer>
+    
+    引入方式
+    <div th:insert="footer :: copy"></div>
+    <div th:replace="footer :: copy"></div>
+    <div th:include="footer :: copy"></div>
+    
+    效果
+    <div>
+        <footer>
+        &copy; 2011 The Good Thymes Virtual Grocery
+        </footer>
+    </div>
+    
+    <footer>
+    &copy; 2011 The Good Thymes Virtual Grocery
+    </footer>
+    
+    <div>
+    &copy; 2011 The Good Thymes Virtual Grocery
+    </div>
+    ```
+
+	3. 引入示例：
+
+    1. 公用bar部分 抽取
+
+       ```html
+       示例1
+       <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0" th:fragment="topbar">
+       示例2
+       <!--侧边栏 设定公共侧边栏-->
+       <nav class="col-md-2 d-none d-md-block bg-light sidebar" th:fragment="sidebar">
+       ```
+
+    2. 在其他html页面引用公用bar
+
+       引入前删除重复的div
+
+       ```html
+       示例1 引入
+       <!--引入抽取的bar-->
+       <div th:insert="~{dashboard::topbar}"></div>
+       示例2 引入
+       <!--引入公用侧边栏-->
+       <div th:insert="~{dashboard::sidebar}"></div>
+       ```
+
+       
+
+    
 

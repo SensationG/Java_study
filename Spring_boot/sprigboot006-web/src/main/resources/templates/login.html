@@ -7,19 +7,23 @@
 		<meta name="author" content="">
 		<title>Signin Template for Bootstrap</title>
 		<!-- Bootstrap core CSS -->
-		<link href="asserts/css/bootstrap.min.css" rel="stylesheet">
+		<link href="asserts/css/bootstrap.min.css"  rel="stylesheet">
 		<!-- Custom styles for this template -->
-		<link href="asserts/css/signin.css" rel="stylesheet">
+		<link href="asserts/css/signin.css"  rel="stylesheet">
 	</head>
 
 	<body class="text-center">
-		<form class="form-signin" action="dashboard.html">
-			<img class="mb-4" src="asserts/img/bootstrap-solid.svg" alt="" width="72" height="72">
+		<!--th:action="@{/user/login}" 表单提交地址 method="post"-->
+		<form class="form-signin" action="dashboard.html" th:action="@{/login}" method="post">
+			<img class="mb-4"  src="asserts/img/bootstrap-solid.svg" alt="" width="72" height="72">
 			<h1 class="h3 mb-3 font-weight-normal" th:text="#{login.tip}">Please sign in</h1>
+			<!--登陆错误消息提示 满足th:if条件检查字符串是否为空后才显示该p标签-->
+			<p style="color: red;" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
+
 			<label class="sr-only" th:text="#{login.username}" >Username</label>
-			<input type="text" class="form-control" placeholder="Username" th:placeholder="#{login.username}" required="" autofocus="">
+			<input type="text" name="username" class="form-control" placeholder="Username" th:placeholder="#{login.username}" required="" autofocus="">
 			<label class="sr-only" th:text="#{login.passwd}">Password</label>
-			<input type="password" class="form-control" placeholder="Password" th:placeholder="#{login.passwd}" required="">
+			<input type="password" name="password" class="form-control" placeholder="Password" th:placeholder="#{login.passwd}" required="">
 			<div class="checkbox mb-3">
 				<label>
           <input type="checkbox" value="remember-me" />[[#{login.remember}]]
