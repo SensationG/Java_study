@@ -1532,7 +1532,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
     | 修改 | updateEmp?id=xxx&xxx=xx   | emp/{id}---PUT    |
     | 删除 | deleteEmp?id=1            | emp/{id}---DELETE |
 
-	3. 本web开发的请求样例
+3. 本web开发的请求样例
 
     举例：以id=1 的员工为例
 
@@ -1548,8 +1548,10 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
 #### 6.员工列表
 
- 1. 编写Controller
+ 1. 编写Controller 使用Model 将值存入域中 
 
+    *//把数据保存到Model中，SpringMVC会自动把这些数据保存到request域中*
+    
     ```java
     @Controller
     public class Employee {
@@ -1558,11 +1560,32 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
         EmployeeDao employeeDao = new EmployeeDao();
     
         @GetMapping("/emps")
-        public String emplist(ModelAndView modelAndView){
+        public String emplist(Model model){
     
             Collection<com.athhw.sprigboot006web.entities.Employee> employee = employeeDao.getAll();
+            model.addAttribute("emps",employee);
+            return "emp/list";
+        }
+    }
+    ```
+    
+    或使用modelandview转发数据
+    
+    ```java
+    @Controller
+    public class Employee {
+    
+        @Autowired
+        EmployeeDao employeeDao = new EmployeeDao();
+    
+        @GetMapping("/emps")
+        public ModelAndView  emplist(ModelAndView modelAndView){
+    
+            Collection<com.athhw.sprigboot006web.entities.Employee> employee = employeeDao.getAll();
+            //model.addAttribute("emps",employee);
             modelAndView.addObject("emps",employee);
-            return "emp/list"; //把list放到了templates/emp 文件夹内
+            modelAndView.setViewName("emp/list");
+            return modelAndView;
         }
     }
     ```
@@ -1600,8 +1623,8 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
     </footer>
     
     引入方式
-    <div th:insert="footer :: copy"></div>
-    <div th:replace="footer :: copy"></div>
+    <div th:insert="~{footer :: copy}"></div>
+    <div th:replace="footer :: #copy"></div>
     <div th:include="footer :: copy"></div>
     
     效果
@@ -1620,7 +1643,7 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
     </div>
     ```
 
-	3. 引入示例：
+3. 引入示例：
 
     1. 公用bar部分 抽取
 
@@ -1645,7 +1668,114 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
        <div th:insert="~{dashboard::sidebar}"></div>
        ```
 
-       
+#### 8.在HTML中取出Controller的转发数据（遍历集合，格式化，判断）
+
+ 1. 使用遍历的方式取出 thymeleaf语法
+
+    ```html
+    <tbody>
+        <tr th:each="emp:${emps}">
+            <td th:text="${emp.id}"></td>
+            <td th:text="${emp.lastName}"></td>
+            <td th:text="${emp.email}"></td>
+            <td th:text="${emp.gender}==0?'女':'男'"></td> 对数据在前端进行判断
+            时间格式化：
+            <td th:text="${#dates.format(emp.birth,'dd/MMM/yyyy-HH:mm')}"></td> 
+            取出deppartment类中的name：
+            <td th:text="${emp.department.departmentName}"></td> 
+        </tr>
+    </tbody>
+    ```
+
+#### 9.添加员工
+
+ 1. controller
+
+    ```java
+    //员工添加处理 添加完后跳转到其他的Controller处理
+        //SpringMVC自动将请求参数和形参对象属性进行一一绑定：要求请求参数的名字和javabean形参对象里面的属性名name相同
+        @PostMapping("/addEmp")
+        public String addEmp(Employee employee){
+    
+            System.out.println("保存的员工信息："+employee);
+            employeeDao.save(employee);//保存员工
+            //添加完返回列表页面 return /emps的Controller处理
+            //redirect: 重定向一个地址  /代表当前项目路径
+            //foward: 转发到一个地址
+            return "redirect:/emps";
+        }
+    ```
+
+	2. 填写员工信息的form表单
+
+    ```java
+    
+    				<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    					<!--设定员工田间form 处理地址-->
+    					<!--设定form属性名name和提交对象属性一致-->
+    					<form th:action="@{/addEmp}" method="post">
+    						<!--姓名 lastName-->
+    						<div class="form-group">
+    							<label>LastName</label>
+    							<input type="text" name="lastName" class="form-control" placeholder="zhangsan">
+    						</div>
+    						<!--邮箱 email-->
+    						<div class="form-group">
+    							<label>Email</label>
+    							<input type="email" name="email" class="form-control" placeholder="zhangsan@atguigu.com">
+    						</div>
+    						<!--性别gender -->
+    						<div class="form-group">
+    							<label>Gender</label><br/>
+    							<div class="form-check form-check-inline">
+    								<input class="form-check-input" type="radio" name="gender"  value="1">
+    								<label class="form-check-label">男</label>
+    							</div>
+    							<div class="form-check form-check-inline">
+    								<input class="form-check-input" type="radio" name="gender"  value="0">
+    								<label class="form-check-label">女</label>
+    							</div>
+    						</div>
+    						<!--部门id department.id-->
+    						<div class="form-group">
+    							<label>department</label>
+    							<select class="form-control" name="department.id">
+    								<!--查询部门 显示部门名 提交数据 提交部门id-->
+    								<option th:value="${dId.id}" th:each="dId:${dIds}">[[${dId.departmentName}]]</option>
+    							</select>
+    						</div>
+    						<!--生日 birth-->
+    						<div class="form-group">
+    							<label>Birth</label>
+    							<input type="text" name="birth" class="form-control" placeholder="2012/12/12">
+    						</div>
+    						<button type="submit" class="btn btn-primary">添加</button>
+    					</form>
+    ```
+
+#### 10.员工修改
+
+ 1. Controller
+
+    ```java
+    //员工数据修改
+    @PostMapping("/editEmp")
+    public String updateEmployee(Employee employee){
+        System.out.println("修改的员工数据："+employee);
+        employeeDao.save(employee);
+        //回到emps 的controller处理
+        return "redirect:/emps";
+    }
+    ```
+
+ 2. 新建一个与add员工相同的页面
+
+    ```html
+    <!--使用input type="hidden"标签传输员工id-->
+    <input type="hidden" name="id" th:value="${emps.id}">
+    ```
 
     
+
+
 
