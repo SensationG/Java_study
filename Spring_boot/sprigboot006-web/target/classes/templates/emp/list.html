@@ -78,7 +78,12 @@
 									<td>
 										<!--将员工id传入请求 使用字符串拼串的方式-->
 										<a class="btn btn-sm btn-primary" th:href="@{/emp/}+${emp.id}">修改</a>
-										<button class="btn btn-sm btn-danger">删除</button>
+										<!--删除时delete请求 action路径无需改变 对应controller的delete请求的路径-->
+										<form th:action="@{/emp/}+${emp.id}" method="post">
+											<!--从input发送delete请求 -->
+											<input type="hidden" name="_method" value="delete">
+											<button type="submit" class="btn btn-sm btn-danger" >删除</button>
+										</form>
 									</td>
 								</tr>
 							</tbody>

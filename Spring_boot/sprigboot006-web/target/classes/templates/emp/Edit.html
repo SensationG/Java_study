@@ -58,6 +58,7 @@
 					<!--二合一页面 员工修改+添加 需要判断是什么页面来决定是否回显 使用判断来决定是否回显 ${emps!=null}?${emps.lastName}-->
 					<form th:action="@{/editEmp}" method="post">
 
+						<!--使用input type="hidden"标签传输员工id-->
 						<input type="hidden" name="id" th:value="${emps.id}">
 						<!--姓名 lastName-->
 						<div class="form-group">

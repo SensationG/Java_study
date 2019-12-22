@@ -1775,7 +1775,40 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
     <input type="hidden" name="id" th:value="${emps.id}">
     ```
 
+#### 11.员工删除
+
+ 1. html页面
+
+    ```html
+    <!--删除时delete请求 action路径无需改变 对应controller的delete请求的路径-->
+    <form th:action="@{/emp/}+${emp.id}" method="post">
+    <!--从input发送delete请求 -->
+    <input type="hidden" name="_method" value="delete">
+    <button type="submit" class="btn btn-sm btn-danger" >删除</button>
+    </form>
+    ```
+
+	2. controller页面
+
+    ```java
+    //员工删除
+    @DeleteMapping("/emp/{id}")
+    public String deleteEmployee(@PathVariable("id") Integer id){
+        employeeDao.delete(id);
+        return "redirect:/emps";
+    }
+    ```
+
+	3. 要实现html传送delete请求，必须配置HiddenHttpMethodFilter过滤器
+
+#### 12.错误机制处理
+
+ 1. 遇到不存在的页面，spring默认返回一个错误页面
+
+    ![](mdpicture/搜狗截图20180226173408.png)
+
+	2. 
+
+	3. 
+
     
-
-
-

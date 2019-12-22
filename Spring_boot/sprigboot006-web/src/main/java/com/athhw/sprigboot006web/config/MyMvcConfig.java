@@ -1,8 +1,10 @@
 package com.athhw.sprigboot006web.config;
 import com.athhw.sprigboot006web.clanguage.MylocaleResolver;
+import com.athhw.sprigboot006web.interceptor.Hidden;
 import com.athhw.sprigboot006web.interceptor.loginInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -38,5 +40,11 @@ public class MyMvcConfig implements WebMvcConfigurer {
         noturls.add("/asserts/**"); //静态资源不能拦截
         registry.addInterceptor(new loginInterceptor()).addPathPatterns("/**") //-》 /**拦截所有请求
                     .excludePathPatterns(noturls);
+    }
+
+    //配置Restful风格过滤器 使表单的post请求可转为delete和put
+    @Bean
+    public HiddenHttpMethodFilter Hidder(){
+        return new Hidden();
     }
 }
