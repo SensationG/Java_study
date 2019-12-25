@@ -1,7 +1,10 @@
 package com.athhw.sprigboot006web.controller;
 
+import com.athhw.sprigboot006web.exception.UserNotExitException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Arrays;
@@ -13,7 +16,12 @@ public class HelloController {
 
     @ResponseBody
     @RequestMapping("/hello")
-    public String hello(){
+    //抛出自定义异常类测试 参数直接从url输入
+    public String hello(@RequestParam("user") String user){
+        //抛出异常
+        if(user.equals("aaa")){
+            throw new UserNotExitException();
+        }
         return "hello world";
     }
 

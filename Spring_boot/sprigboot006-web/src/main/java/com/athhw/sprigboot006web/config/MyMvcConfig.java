@@ -32,15 +32,17 @@ public class MyMvcConfig implements WebMvcConfigurer {
     }
 
     //扩展自定义拦截器
-    public void addInterceptors(InterceptorRegistry registry) {
-        List<String> noturls = new ArrayList<>(); //不拦截的页面和请求
-        noturls.add("/index.html");
-        noturls.add("/");
-        noturls.add("/login");
-        noturls.add("/asserts/**"); //静态资源不能拦截
-        registry.addInterceptor(new loginInterceptor()).addPathPatterns("/**") //-》 /**拦截所有请求
-                    .excludePathPatterns(noturls);
-    }
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        List<String> noturls = new ArrayList<>(); //不拦截的页面和请求
+//        noturls.add("/index.html");
+//        noturls.add("/");
+//        noturls.add("/login");
+//        noturls.add("/asserts/**"); //静态资源不能拦截
+//        noturls.add("/hello");
+//        noturls.add("/hello?user=aaa");
+//        registry.addInterceptor(new loginInterceptor()).addPathPatterns("/**") //-》 /**拦截所有请求
+//                    .excludePathPatterns(noturls);
+//    }
 
     //配置Restful风格过滤器 使表单的post请求可转为delete和put
     @Bean
